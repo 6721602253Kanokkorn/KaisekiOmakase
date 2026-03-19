@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { getPool } = require('../db');
+const { getConn } = require('../db');
 
 // GET reservations
 router.get('/', async (req, res) => {
   try {
-    const conn = getPool();
+    const conn = getConn();
     const [rows] = await conn.query(`
-      SELECT r.*, t.table_name
-      FROM reservations r
-      JOIN tables t ON r.table_id = t.table_id
-      ORDER BY r.created_at DESC
+      SELECT r.*, dt.table_number, c.firstname, c.lastname
+      FROM reservation r
+      JOIN dining_tables dt ON r.table_id = dt.table_id
+      JOIN customer c ON r.customer_id = c.customer_id
+      ORDER BY r.create_at DESC
     `);
     res.json(rows);
   } catch (err) {
@@ -22,21 +23,23 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const {
-      table_id, firstname, lastname, phone,
-      email, date, time, number_of_people
+      table_id, customer_id,
+      reservation_date, reservation_time,
+      number_of_people, special_request
     } = req.body;
 
-    const conn = getPool();
+    const conn = getConn();
 
     await conn.query(
-      `INSERT INTO reservations
-      (table_id, firstname, lastname, phone, email, date, time, number_of_people)
-      VALUES (?,?,?,?,?,?,?,?)`,
-      [table_id, firstname, lastname, phone, email, date, time, number_of_people]
+      `INSERT INTO reservation
+      (table_id, customer_id, reservation_date, reservation_time, number_of_people, special_request, status)
+      VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
+      [table_id, customer_id, reservation_date, reservation_time, number_of_people, special_request || null]
     );
 
+    // อัปเดตสถานะโต๊ะเป็น reserved
     await conn.query(
-      'UPDATE tables SET status = "reserved" WHERE table_id = ?',
+      'UPDATE dining_tables SET status = "reserved" WHERE table_id = ?',
       [table_id]
     );
 

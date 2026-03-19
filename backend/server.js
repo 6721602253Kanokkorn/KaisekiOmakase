@@ -35,12 +35,18 @@ app.get('/ping', async (req, res) => {
 });
 
 // ===== Start Server =====
-app.listen(PORT, async () => {
+async function startServer() {
   try {
-    await initMySQL(); // 👈 connect DB ก่อนใช้งาน
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    await initMySQL();
+    console.log('✅ DB connected');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
   } catch (err) {
     console.error('❌ DB connection failed:', err.message);
     process.exit(1);
   }
-});
+}
+
+startServer();
