@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>เลือกโต๊ะ – Kaiseki Omakase</title>
+  <link rel="stylesheet" href="css/tables.css"/>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="top-nav">
+    <a href="index.html" class="nav-logo">Kaiseki Omakase</a>
+    <div class="nav-right">
+      <span id="nav-user" class="nav-user"></span>
+      <button class="btn-outline" onclick="logout()">ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <div class="tables-container">
+
+    <!-- LEFT: Table map -->
+    <div class="tables-left">
+      <div class="tables-header">
+        <span class="section-label">Reservation</span>
+        <h2>Table Reservation</h2>
+        <p>เลือกโต๊ะที่ต้องการ</p>
+      </div>
+
+      <!-- สรุปข้อมูลจาก booking.html -->
+      <div id="booking-summary"></div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot available"></span>ว่าง</div>
+        <div class="legend-item"><span class="legend-dot reserved"></span>จองแล้ว</div>
+        <div class="legend-item"><span class="legend-dot occupied"></span>ใช้บริการอยู่</div>
+      </div>
+
+      <div class="tables-grid" id="tables-grid">
+        <div class="table-skeleton"></div>
+        <div class="table-skeleton"></div>
+        <div class="table-skeleton"></div>
+        <div class="table-skeleton"></div>
+        <div class="table-skeleton"></div>
+        <div class="table-skeleton"></div>
+      </div>
+
+      <p class="realtime-note">อัปเดตสถานะทุก 5 วินาที</p>
+    </div>
+
+    <!-- RIGHT: Confirm panel (แสดงหลังเลือกโต๊ะ) -->
+    <div class="tables-right" id="reservation-panel">
+
+      <!-- placeholder ก่อนเลือกโต๊ะ -->
+      <div class="panel-placeholder" id="panel-placeholder">
+        <div class="placeholder-icon">— —</div>
+        <p>เลือกโต๊ะทางซ้ายเพื่อยืนยันการจอง</p>
+      </div>
+
+      <!-- แผงยืนยัน (ซ่อนไว้ก่อน) -->
+      <div class="confirm-panel" id="confirm-panel" style="display:none">
+        <h3>ยืนยันการจอง</h3>
+
+        <div id="res-error"   class="error-box"   style="display:none"></div>
+        <div id="res-success" class="success-box" style="display:none"></div>
+
+        <div class="confirm-detail">
+          <div class="confirm-row"><span>โต๊ะ</span>      <strong id="cf-table"></strong></div>
+          <div class="confirm-row"><span>ที่นั่ง</span>    <strong id="cf-capacity"></strong></div>
+          <div class="confirm-row"><span>ชื่อ</span>       <strong id="cf-name"></strong></div>
+          <div class="confirm-row"><span>โทร</span>        <strong id="cf-phone"></strong></div>
+          <div class="confirm-row"><span>อีเมล</span>      <strong id="cf-email"></strong></div>
+          <div class="confirm-row"><span>วันที่</span>     <strong id="cf-date"></strong></div>
+          <div class="confirm-row"><span>เวลา</span>       <strong id="cf-time"></strong></div>
+          <div class="confirm-row"><span>จำนวนคน</span>   <strong id="cf-people"></strong></div>
+          <div class="confirm-row"><span>คำขอพิเศษ</span> <strong id="cf-special"></strong></div>
+        </div>
+
+        <button class="btn-main"  onclick="submitReservation()">ยืนยันการจอง</button>
+        <button class="btn-ghost" onclick="cancelSelection()">← เลือกโต๊ะใหม่</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/tables.js"></script>
+</body>
+</html>
