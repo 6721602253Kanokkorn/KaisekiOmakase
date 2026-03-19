@@ -102,8 +102,8 @@ router.post('/', async (req, res) => {
           from:    '"Kaiseki Omakase" <your@gmail.com>',
           to:      email,
           subject: 'ยืนยันการจองโต๊ะ – Kaiseki Omakase',
-          html: `
-            <div style="background:#0a0a0a;max-width:520px;margin:auto;border-radius:10px;overflow:hidden;border:1px solid #1e1e1e;font-family:sans-serif;">
+         html: `
+<div style="background:#0a0a0a;max-width:520px;margin:auto;border-radius:10px;overflow:hidden;border:1px solid #1e1e1e;font-family:sans-serif;">
   <div style="background:#000;padding:32px 40px 24px;border-bottom:1px solid #1a1a1a;">
     <p style="font-size:11px;letter-spacing:4px;color:#8a6a2a;margin:0 0 6px;">KAISEKI OMAKASE</p>
     <h1 style="font-size:24px;font-weight:400;color:#fff5e2;margin:0;letter-spacing:3px;">ยืนยันการจองโต๊ะ</h1>
@@ -138,8 +138,8 @@ router.post('/', async (req, res) => {
   <div style="background:#000;padding:20px 40px;border-top:1px solid #1a1a1a;text-align:center;">
     <p style="font-size:11px;color:#333;margin:0;letter-spacing:2px;">© 2026 KAISEKI OMAKASE</p>
   </div>
-            </div>
-          `
+</div>
+`
         })
       } catch (mailErr) {
         // เมลส่งไม่ได้ก็ไม่ rollback การจอง แค่ log ไว้
