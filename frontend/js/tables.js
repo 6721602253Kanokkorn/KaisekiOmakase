@@ -1,6 +1,6 @@
 // tables.js — รับข้อมูลจาก booking.html แล้วเลือกโต๊ะ
 
-const API   = 'http://localhost:8000'  // ✅ แก้ port
+const API   = 'http://localhost:3001'
 const token = localStorage.getItem('token')
 const user  = JSON.parse(localStorage.getItem('user') || 'null')
 
@@ -56,9 +56,7 @@ function renderTables(tables) {
     const card = document.createElement('div')
     card.className = `table-card ${t.status}`
 
-    // ✅ ใช้ table_number แทน table_name (ตรงกับ DB จริง)
-    const displayName = `โต๊ะ ${t.table_number}`
-
+    // เช็คว่าที่นั่งพอสำหรับจำนวนคนที่กรอกมาไหม
     const notEnoughSeats = bookingData && parseInt(bookingData.number_of_people) > t.capacity
 
     const statusLabel = {
@@ -71,7 +69,7 @@ function renderTables(tables) {
 
     card.innerHTML = `
       <div class="table-card-icon">${tableIcons[i] || '🍽️'}</div>
-      <h4>${displayName}</h4>
+      <h4>${t.table_name}</h4>
       <p class="capacity">${t.capacity} ที่นั่ง</p>
       ${statusLabel}
     `
@@ -84,12 +82,13 @@ function renderTables(tables) {
     } else {
       card.onclick = () => {
         const msg = t.status === 'reserved'
-          ? `${displayName} มีคนจองแล้ว ไม่สามารถเลือกได้`
-          : `${displayName} กำลังถูกใช้บริการอยู่`
+          ? `${t.table_name} มีคนจองแล้ว ไม่สามารถเลือกได้`
+          : `${t.table_name} กำลังถูกใช้บริการอยู่`
         showToast(msg, 'error')
       }
     }
 
+    // Highlight โต๊ะที่เลือก
     if (selectedTable && selectedTable.table_id === t.table_id) {
       card.style.boxShadow = '0 0 0 3px #2ecc71'
     }
@@ -106,8 +105,8 @@ function selectTable(table) {
   panel.style.display = 'block'
   panel.style.animation = 'fadeUp 0.3s ease'
 
-  // ✅ ใช้ table_number แทน table_name
-  document.getElementById('cf-table').textContent    = `โต๊ะ ${table.table_number}`
+  // แสดงสรุปทั้งหมดในแผง confirm
+  document.getElementById('cf-table').textContent    = table.table_name
   document.getElementById('cf-capacity').textContent = `${table.capacity} ที่นั่ง`
   document.getElementById('cf-name').textContent     = `${bookingData.firstname} ${bookingData.lastname}`
   document.getElementById('cf-phone').textContent    = bookingData.phone
@@ -153,13 +152,19 @@ async function submitReservation() {
     const data = await res.json()
 
     if (res.ok) {
-      showResSuccess(`✅ จองสำเร็จ!`)
+      showResSuccess(`✅ จองสำเร็จ! ส่งอีเมลยืนยันไปที่ ${bookingData.email} แล้ว`)
       sessionStorage.removeItem('bookingData')
       selectedTable = null
       await loadTables()
+
+      // กลับหน้าหลักหลัง 3 วิ
       setTimeout(() => { window.location.href = 'index.html' }, 3500)
     } else {
       showResError(data.message || 'จองไม่สำเร็จ')
+      if (res.status === 400) {
+        cancelSelection()
+        loadTables()
+      }
     }
   } catch (err) {
     showResError('ไม่สามารถเชื่อมต่อ Server ได้')

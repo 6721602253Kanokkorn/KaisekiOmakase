@@ -1,6 +1,6 @@
 // auth.js — signin/signup logic
 
-const API = 'http://localhost:8000'  // ✅ แก้จาก 3001 → 8000
+const API = 'http://localhost:3001'
 
 function showError(msg) {
   const el = document.getElementById('error-msg')
@@ -39,20 +39,22 @@ async function signIn() {
   btn.disabled = true
 
   try {
-    const res = await fetch(`${API}/auth/signin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    })
+const res = await fetch(`${API}/auth/signin`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password })
+})
 
-    // ✅ อ่าน res.json() แค่ครั้งเดียว (ลบ duplicate ออก)
-    let data
-    try {
-      data = await res.json()
-    } catch (e) {
-      showError('Server error (not JSON)')
-      return
-    }
+console.log('STATUS:', res.status)
+
+try {
+  data = await res.json()
+} catch (e) {
+  console.error('JSON parse error', e)
+  showError('Server error (not JSON)')
+  return
+}
+    const data = await res.json()
 
     if (res.ok) {
       localStorage.setItem('token', data.token)
@@ -119,16 +121,17 @@ async function signUp() {
 
 // Enter key support
 document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter') return
+  if (e.key !== 'Enter') return;
 
-  const btn = document.querySelector('.btn-main')
-  if (btn && btn.disabled) return
+  // ตรวจสอบว่าไม่ได้กำลังรอ Response อยู่ (ป้องกันการกดเบิ้ล)
+  const btn = document.querySelector('.btn-main');
+  if (btn && btn.disabled) return;
 
   if (document.getElementById('password') && !document.getElementById('firstname')) {
-    e.preventDefault()
-    signIn()
+    e.preventDefault(); // หยุดการ Refresh หน้าเว็บจาก Default Form Submission
+    signIn();
   } else if (document.getElementById('firstname')) {
-    e.preventDefault()
-    signUp()
+    e.preventDefault(); // หยุดการ Refresh หน้าเว็บ
+    signUp();
   }
-})
+});
