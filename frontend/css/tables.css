@@ -1,14 +1,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-@font-face {
-  font-family: 'Fanlste';
-  src: url('../fonts/fanlste.italic.woff') format('woff');
+:root {
+  --font-title: 'Fahkwang', sans-serif;
+  --font-body:  'KoHo', sans-serif;
 }
-@font-face {
-  font-family: 'KoHo';
-  src: url('../fonts/KoHo.Medium.woff') format('woff');
-}
-
 :root {
   --gold: #c9a96e;
   --cream: #fff5e2;
