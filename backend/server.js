@@ -1,10 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { initMySQL, getConn } = require('./db'); // 👈 ใช้ getConn
+const { initMySQL, getConn } = require('./db'); 
 
 const app = express();
-const PORT = process.env.PORT || 8000; // 👈 เปลี่ยนเป็น 8000
+const PORT = process.env.PORT || 8000; 
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 // ===== Ping DB =====
 app.get('/ping', async (req, res) => {
   try {
-    const conn = getConn(); // 👈 ใช้ conn
+    const conn = getConn();
     const [rows] = await conn.query('SELECT NOW() AS now');
     res.json({ status: 'ok', time: rows[0].now });
   } catch (err) {

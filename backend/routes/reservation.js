@@ -6,15 +6,15 @@ const nodemailer   = require('nodemailer');
 
 const SECRET = 'omakase_secret_key';
 
-// ===== Gmail transporter =====
+// ส่งเมลยืนยัน
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'bbaitoeytoeyy2234@gmail.com',       // ← เปลี่ยนเป็น Gmail ของคุณ
-    pass: 'gnvw cgrf uiru obni'   // ← App Password 16 หลัก
+    user: 'bbaitoeytoeyy2234@gmail.com',      
+    pass: 'gnvw cgrf uiru obni'   
   },
   tls: {
-    rejectUnauthorized: false     // ✅ แก้ self-signed certificate error
+    rejectUnauthorized: false     
   }
 })
 
@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
       date, time,
       number_of_people,
       special_request,
-      email,           // รับ email จาก bookingData เพื่อส่งเมล
+      email,          
       firstname,
       lastname
     } = req.body;

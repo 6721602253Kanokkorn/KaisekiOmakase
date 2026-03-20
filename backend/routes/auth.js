@@ -18,7 +18,7 @@ router.post('/signup', async (req, res) => {
 
     const conn = getConn();
 
-    // เช็คว่า email ซ้ำใน users หรือยัง
+    // mail ซ้ำใน users มั้ย
     const [existingUser] = await conn.query(
       'SELECT * FROM users WHERE email = ?', [email]
     );
