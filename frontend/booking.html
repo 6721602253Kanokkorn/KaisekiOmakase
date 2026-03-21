@@ -4,6 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>จองโต๊ะ – Kaiseki Omakase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fahkwang:wght@300;400;500&family=KoHo:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/booking.css"/>
 </head>
 <body>
@@ -92,9 +95,17 @@
   </div>
 
   <script>
+    const API  = 'http://localhost:8000'  // ✅ port ถูก
     const user = JSON.parse(localStorage.getItem('user') || 'null')
 
+    // ถ้ายังไม่ login ให้กลับไป signin
+    if (!localStorage.getItem('token')) {
+      window.location.href = 'signin.html'
+    }
+
     if (user?.email) document.getElementById('email').value = user.email
+    if (user?.firstname) document.getElementById('firstname').value = user.firstname
+    if (user?.lastname)  document.getElementById('lastname').value  = user.lastname
 
     const today = new Date().toISOString().split('T')[0]
     document.getElementById('date').min = today
@@ -133,10 +144,8 @@
         special_request: special
       }))
 
-      window.location.href = 'tables.html'
+      window.location.href = 'tables.html' 
     }
-    const API = 'http://localhost:3000'
-
   </script>
 </body>
 </html>
