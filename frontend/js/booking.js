@@ -1,5 +1,5 @@
 // ตั้งวันขั้นต่ำเป็นวันนี้
-const API = 'http://localhost:3001'
+const API = 'http://localhost:8000'
 const dateInput = document.getElementById('date');
 const today = new Date().toISOString().split('T')[0];
 dateInput.min = today;
@@ -49,7 +49,7 @@ function submitBooking(event) {
     special_request: special
   }));
 
-  // ไปหน้ารายการเลือกโต๊ะ
+  
   window.location.href = 'tables.html';
   return true;
 }
