@@ -3,12 +3,68 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>จองโต๊ะ – Kaiseki Omakase</title>
+  <title>เลือกโต๊ะ – Kaiseki Omakase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fahkwang:wght@300;400;500&family=KoHo:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tables.css"/>
+  <style>
+    .table-card {
+      height: 120px; border-radius: 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      cursor: pointer; font-size: 13px; letter-spacing: 1px;
+      border: 1px solid transparent;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      gap: 6px; position: relative;
+    }
+    .table-icon { width: 48px; height: 48px; }
+    .table-card h4 { font-size: 12px; letter-spacing: 2px; margin: 0; }
+    .table-cap { font-size: 10px; opacity: 0.6; }
+    .status-dot {
+      position: absolute; top: 8px; right: 8px;
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .available .status-dot { background: #4a7c59; }
+    .reserved  .status-dot { background: #c9a96e; }
+    .occupied  .status-dot { background: #7a3030; }
+    .table-card.selected {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 2px rgba(201,169,110,0.35), 0 8px 24px rgba(201,169,110,0.15);
+    }
+    .confirm-panel { display: none; }
+    .confirm-panel h3 {
+      font-family: var(--font-title); font-size: 22px;
+      color: var(--cream); letter-spacing: 3px; margin-bottom: 20px;
+    }
+    .confirm-table-badge {
+      background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3);
+      color: var(--gold); padding: 10px 16px; border-radius: 6px;
+      text-align: center; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px;
+    }
+    .confirm-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .confirm-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; padding-bottom: 10px; border-bottom: 1px solid #111;
+    }
+    .confirm-row span { color: var(--muted); letter-spacing: 1px; }
+    .confirm-row strong { color: #eee; text-align: right; max-width: 60%; }
+    .summary-box {
+      background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 6px;
+      padding: 14px 16px; margin-bottom: 20px;
+      font-size: 13px; line-height: 1.9; color: #aaa;
+    }
+    .summary-box strong { color: var(--cream); }
+    .back-to-booking {
+      display: inline-block; margin-bottom: 20px; font-size: 12px;
+      color: var(--muted); letter-spacing: 2px; text-decoration: none;
+      transition: color 0.3s;
+    }
+    .back-to-booking:hover { color: var(--gold); }
+  </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <nav class="top-nav">
     <a href="index.html" class="nav-logo">Kaiseki Omakase</a>
     <div class="nav-right">
@@ -19,13 +75,16 @@
 
   <div class="tables-container">
 
-    <!-- LEFT: Table map -->
     <div class="tables-left">
       <div class="tables-header">
         <span class="section-label">Reservation</span>
         <h2>Table Reservation</h2>
         <p>เลือกโต๊ะที่ต้องการ</p>
       </div>
+
+      <a href="booking.html" class="back-to-booking">← แก้ไขข้อมูลการจอง</a>
+
+      <div id="booking-summary"></div>
 
       <div class="legend">
         <div class="legend-item"><span class="legend-dot available"></span>ว่าง</div>
@@ -45,67 +104,36 @@
       <p class="realtime-note">อัปเดตสถานะทุก 5 วินาที</p>
     </div>
 
-    <!-- RIGHT: Reservation form -->
     <div class="tables-right" id="reservation-panel">
 
       <div class="panel-placeholder" id="panel-placeholder">
         <div class="placeholder-icon">— —</div>
-        <p>เลือกโต๊ะทางซ้ายเพื่อกรอกข้อมูลการจอง</p>
+        <p>เลือกโต๊ะทางซ้ายเพื่อยืนยันการจอง</p>
       </div>
 
-      <div class="reservation-form" id="reservation-form" style="display:none">
-        <h3>กรอกข้อมูลการจอง</h3>
-        <div class="selected-table-badge" id="selected-table-info"></div>
-
-        <div id="res-error" class="error-box" style="display:none"></div>
+      <div class="confirm-panel" id="confirm-panel">
+        <h3>ยืนยันการจอง</h3>
+        <div id="res-error"   class="error-box"   style="display:none"></div>
         <div id="res-success" class="success-box" style="display:none"></div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Firstname</label>
-            <input type="text" id="res-firstname" placeholder="ชื่อ"/>
-          </div>
-          <div class="form-group">
-            <label>Lastname</label>
-            <input type="text" id="res-lastname" placeholder="นามสกุล"/>
-          </div>
+        <div class="confirm-table-badge" id="cf-table-badge">โต๊ะ —</div>
+        <div class="confirm-rows">
+          <div class="confirm-row"><span>โต๊ะ</span>      <strong id="cf-table"></strong></div>
+          <div class="confirm-row"><span>ที่นั่ง</span>    <strong id="cf-capacity"></strong></div>
+          <div class="confirm-row"><span>ชื่อ</span>       <strong id="cf-name"></strong></div>
+          <div class="confirm-row"><span>โทรศัพท์</span>   <strong id="cf-phone"></strong></div>
+          <div class="confirm-row"><span>อีเมล</span>      <strong id="cf-email"></strong></div>
+          <div class="confirm-row"><span>วันที่</span>     <strong id="cf-date"></strong></div>
+          <div class="confirm-row"><span>เวลา</span>       <strong id="cf-time"></strong></div>
+          <div class="confirm-row"><span>จำนวนคน</span>   <strong id="cf-people"></strong></div>
+          <div class="confirm-row"><span>คำขอพิเศษ</span> <strong id="cf-special"></strong></div>
         </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="res-phone" placeholder="0812345678"/>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="res-email" placeholder="your@email.com"/>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>วันที่</label>
-            <input type="date" id="res-date"/>
-          </div>
-          <div class="form-group">
-            <label>เวลา</label>
-            <input type="time" id="res-time"/>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>จำนวนคน</label>
-          <input type="number" id="res-people" min="1" max="10" placeholder="2"/>
-        </div>
-        <div class="form-group">
-          <label>Special Request</label>
-          <textarea id="res-special" placeholder="แพ้อาหาร, ขอเค้กวันเกิด..."></textarea>
-        </div>
-
-        <button class="btn-main" onclick="submitReservation()">ยืนยันการจอง</button>
-        <button class="btn-ghost" onclick="cancelSelection()">ยกเลิก</button>
+        <button class="btn-main"  onclick="submitReservation()">✓ ยืนยันการจอง</button>
+        <button class="btn-ghost" onclick="cancelSelection()">← เลือกโต๊ะใหม่</button>
       </div>
 
     </div>
   </div>
 
-  <script src="js/tables.js">
-    const API = 'http://localhost:3000'
-  </script>
+  <script src="js/tables.js"></script>
 </body>
 </html>
