@@ -1,13 +1,12 @@
 const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const router  = express.Router();
+const bcrypt  = require('bcrypt');
+const jwt     = require('jsonwebtoken');
 const { getConn } = require('../db');
 
 const SECRET = 'omakase_secret_key';
 
 // ======== SIGN UP ========
-// flow: INSERT customer → INSERT users (linked by customer_id)
 router.post('/signup', async (req, res) => {
   try {
     const { firstname, lastname, email, password, phone } = req.body;
@@ -18,31 +17,29 @@ router.post('/signup', async (req, res) => {
 
     const conn = getConn();
 
-    // mail ซ้ำใน users มั้ย
-    const [existingUser] = await conn.query(
+    // เช็ค email ซ้ำ
+    const [existing] = await conn.query(
       'SELECT * FROM users WHERE email = ?', [email]
     );
-    if (existingUser.length > 0) {
+    if (existing.length > 0) {
       return res.status(409).json({ message: 'อีเมลนี้มีผู้ใช้แล้ว' });
     }
 
-    // 1) INSERT เข้า customer ก่อน
+    // INSERT customer ก่อน
     const [customerResult] = await conn.query(
       'INSERT INTO customer (firstname, lastname, phone, email, create_at) VALUES (?, ?, ?, ?, NOW())',
       [firstname, lastname, phone || null, email]
     );
     const newCustomerId = customerResult.insertId;
 
-    // 2) hash password แล้ว INSERT เข้า users
+    // hash password แล้ว INSERT users
     const hashed = await bcrypt.hash(password, 10);
-
     await conn.query(
       'INSERT INTO users (email, password_hash, role, customer_id) VALUES (?, ?, ?, ?)',
       [email, hashed, 'customer', newCustomerId]
     );
 
     res.json({ message: 'สมัครสมาชิกสำเร็จ' });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -54,7 +51,7 @@ router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
     const conn = getConn();
 
-    // JOIN users กับ customer เพื่อดึง firstname ด้วย
+    // JOIN users + customer
     const [rows] = await conn.query(`
       SELECT u.*, c.firstname, c.lastname
       FROM users u
@@ -85,14 +82,18 @@ router.post('/signin', async (req, res) => {
       token,
       user: {
         firstname: user.firstname,
-        email: user.email,
-        role: user.role
+        email:     user.email,
+        role:      user.role
       }
     });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+// ======== SIGN OUT ========
+router.post('/signout', (req, res) => {
+  res.json({ message: 'ออกจากระบบสำเร็จ' });
 });
 
 module.exports = router;
