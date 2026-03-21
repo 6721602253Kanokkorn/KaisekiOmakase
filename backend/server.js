@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
   res.send('Reservation Backend is running 🚀');
 });
 
-// ===== Ping DB =====
+// ===== Ping DB ====
 app.get('/ping', async (req, res) => {
   try {
     const conn = getConn();
