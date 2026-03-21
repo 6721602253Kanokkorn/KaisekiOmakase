@@ -1,5 +1,5 @@
 /* ===== SCROLL REVEAL ===== */
-const API = 'http://localhost:3001'
+const API = 'http://localhost:8000'
 document.addEventListener('DOMContentLoaded', () => {
 
   // Reveal on scroll
