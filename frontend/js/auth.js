@@ -1,13 +1,12 @@
-// auth.js — signin/signup logic
-
-const API = 'http://localhost:3001'
+const API = 'http://localhost:8000'
 
 function showError(msg) {
   const el = document.getElementById('error-msg')
   if (!el) return
   el.textContent = msg
   el.style.display = 'block'
-  document.getElementById('success-msg') && (document.getElementById('success-msg').style.display = 'none')
+  const s = document.getElementById('success-msg')
+  if (s) s.style.display = 'none'
 }
 
 function showSuccess(msg) {
@@ -15,12 +14,15 @@ function showSuccess(msg) {
   if (!el) return
   el.textContent = msg
   el.style.display = 'block'
-  document.getElementById('error-msg') && (document.getElementById('error-msg').style.display = 'none')
+  const e = document.getElementById('error-msg')
+  if (e) e.style.display = 'none'
 }
 
 function hideMessages() {
-  document.getElementById('error-msg')   && (document.getElementById('error-msg').style.display   = 'none')
-  document.getElementById('success-msg') && (document.getElementById('success-msg').style.display = 'none')
+  const e = document.getElementById('error-msg')
+  const s = document.getElementById('success-msg')
+  if (e) e.style.display = 'none'
+  if (s) s.style.display = 'none'
 }
 
 // ======== SIGN IN ========
@@ -39,22 +41,19 @@ async function signIn() {
   btn.disabled = true
 
   try {
-const res = await fetch(`${API}/auth/signin`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, password })
-})
+    const res = await fetch(`${API}/auth/signin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
 
-console.log('STATUS:', res.status)
-
-try {
-  data = await res.json()
-} catch (e) {
-  console.error('JSON parse error', e)
-  showError('Server error (not JSON)')
-  return
-}
-    const data = await res.json()
+    let data
+    try {
+      data = await res.json()
+    } catch (e) {
+      showError('Server error (not JSON)')
+      return
+    }
 
     if (res.ok) {
       localStorage.setItem('token', data.token)
@@ -119,19 +118,16 @@ async function signUp() {
   }
 }
 
-// Enter key support
+// Enter key
 document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter') return;
-
-  // ตรวจสอบว่าไม่ได้กำลังรอ Response อยู่ (ป้องกันการกดเบิ้ล)
-  const btn = document.querySelector('.btn-main');
-  if (btn && btn.disabled) return;
-
+  if (e.key !== 'Enter') return
+  const btn = document.querySelector('.btn-main')
+  if (btn && btn.disabled) return
   if (document.getElementById('password') && !document.getElementById('firstname')) {
-    e.preventDefault(); // หยุดการ Refresh หน้าเว็บจาก Default Form Submission
-    signIn();
+    e.preventDefault()
+    signIn()
   } else if (document.getElementById('firstname')) {
-    e.preventDefault(); // หยุดการ Refresh หน้าเว็บ
-    signUp();
+    e.preventDefault()
+    signUp()
   }
-});
+})
